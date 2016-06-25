@@ -5,7 +5,7 @@ Some modifications applie to compile on Ubuntu
 
 ## Build and Run
 
-g++ -std=c++0x -fpermissive main.cpp -o karplus-strong
+    g++ -std=c++0x -fpermissive main.cpp -o karplus-strong
 
 ## TODO
 
