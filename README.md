@@ -14,6 +14,8 @@ Some modifications applie to compile on Ubuntu
 
 Links
 -----
+[Synthesizing a Plucked String]
 
-[Synthesizing a Plucked String Sound With the Karplus-Strong Algorithm | The blog at the bottom of the sea](http://blog.demofox.org/2016/06/16/synthesizing-a-pluked-string-sound-with-the-karplus-strong-algorithm/)
+[Synthesizing a Plucked String]:http://blog.demofox.org/2016/06/16/synthesizing-a-pluked-string-sound-with-the-karplus-strong-algorithm/
+
 
