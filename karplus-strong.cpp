@@ -17,8 +17,7 @@ typedef int16_t     int16;
 typedef int32_t     int32;
  
 //this struct is the minimal required header data for a wav file
-struct SMinimalWaveFileHeader
-{
+struct SMinimalWaveFileHeader {
     //the main chunk
     unsigned char m_chunkID[4];
     uint32        m_chunkSize;
@@ -43,17 +42,15 @@ struct SMinimalWaveFileHeader
  
 //this writes
 template <typename T>
-bool WriteWaveFile(const char *fileName, std::vector<T> data, int16 numChannels, int32 sampleRate)
-{
+bool WriteWaveFile(const char *fileName, std::vector<T> data, int16 numChannels, int32 sampleRate) {
     int32 dataSize = data.size() * sizeof(T);
     int32 bitsPerSample = sizeof(T) * 8;
  
     //open the file if we can
-    //FILE *File = nullptr;
-    //fopen_s(&File, fileName, "w+b");
     FILE *File = fopen(fileName, "w+b");
-    if (!File)
+    if (!File) {
         return false;
+    }
  
     SMinimalWaveFileHeader waveHeader;
  
@@ -88,14 +85,12 @@ bool WriteWaveFile(const char *fileName, std::vector<T> data, int16 numChannels,
 }
  
 template <typename T>
-void ConvertFloatSamples (const std::vector<float>& in, std::vector<T>& out)
-{
+void ConvertFloatSamples (const std::vector<float>& in, std::vector<T>& out) {
     // make our out samples the right size
     out.resize(in.size());
  
     // convert in format to out format !
-    for (size_t i = 0, c = in.size(); i < c; ++i)
-    {
+    for (size_t i = 0, c = in.size(); i < c; ++i) {
         float v = in[i];
         if (v < 0.0f)
             v *= -float(std::numeric_limits<T>::lowest());
@@ -106,7 +101,7 @@ void ConvertFloatSamples (const std::vector<float>& in, std::vector<T>& out)
 }
 //calculate the frequency of the specified note.
 //fractional notes allowed!
-float CalcFrequency(float octave, float note)
+float CalcFrequency(float octave, float note) {
 /*
     Calculate the frequency of any note!
     frequency = 440×(2^(n/12))
@@ -129,15 +124,16 @@ float CalcFrequency(float octave, float note)
     10 = G
     11 = G#
 */
-{
     return (float)(440 * pow(2.0, ((double)((octave - 4) * 12 + note)) / 12.0));
 }
  
-class CKarplusStrongStringPluck
-{
+class CKarplusStrongStringPluck {
+    std::vector<float>  m_buffer;
+    size_t              m_index;
+    float               m_feedback;
+
 public:
-    CKarplusStrongStringPluck (float frequency, float sampleRate, float feedback)
-    {
+    CKarplusStrongStringPluck (float frequency, float sampleRate, float feedback) {
         m_buffer.resize(uint32(float(sampleRate) / frequency));
         for (size_t i = 0, c = m_buffer.size(); i < c; ++i) {
             m_buffer[i] = ((float)rand()) / ((float)RAND_MAX) * 2.0f - 1.0f;  // noise
@@ -147,8 +143,7 @@ public:
         m_feedback = feedback;
     }
  
-    float GenerateSample ()
-    {
+    float GenerateSample () {
         // get our sample to return
         float ret = m_buffer[m_index];
  
@@ -162,15 +157,9 @@ public:
         // return the sample from the buffer
         return ret;
     }
- 
-private:
-    std::vector<float>  m_buffer;
-    size_t              m_index;
-    float               m_feedback;
 };
  
-void GenerateSamples (std::vector<float>& samples, int sampleRate)
-{
+void GenerateSamples (std::vector<float>& samples, int sampleRate) {
     std::vector<CKarplusStrongStringPluck> notes;
  
     enum ESongMode {
@@ -180,8 +169,7 @@ void GenerateSamples (std::vector<float>& samples, int sampleRate)
  
     int timeBegin = 0;
     ESongMode mode = e_twinkleTwinkle;
-    for (int index = 0, numSamples = samples.size(); index < numSamples; ++index)
-    {
+    for (int index = 0, numSamples = samples.size(); index < numSamples; ++index) {
         switch (mode) {
             case e_twinkleTwinkle: {
                 const int c_noteTime = sampleRate / 2;
@@ -247,8 +235,7 @@ void GenerateSamples (std::vector<float>& samples, int sampleRate)
 }
  
 //the entry point of our application
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     // sound format parameters
     const int c_sampleRate = 44100;
     const int c_numSeconds = 9;
