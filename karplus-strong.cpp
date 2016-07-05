@@ -126,13 +126,13 @@ float CalcFrequency(float octave, float note) {
   return (float)(440 * pow(2.0, ((double)((octave - 4) * 12 + note)) / 12.0));
 }
 
-class CKarplusStrongStringPluck {
+class StringPluck {
   std::vector<float>  m_buffer;
   size_t              m_index;
   float               m_feedback;
 
   public:
-  CKarplusStrongStringPluck (float frequency, float sampleRate, float feedback) {
+  StringPluck (float frequency, float sampleRate, float feedback) {
     m_buffer.resize(uint32(float(sampleRate) / frequency));
     for (size_t i = 0, c = m_buffer.size(); i < c; ++i) {
       m_buffer[i] = ((float)rand()) / ((float)RAND_MAX) * 2.0f - 1.0f;  // noise
@@ -159,7 +159,7 @@ class CKarplusStrongStringPluck {
 };
  
 void GenerateSamples (std::vector<float>& samples, int sampleRate) {
-  std::vector<CKarplusStrongStringPluck> notes;
+  std::vector<StringPluck> notes;
 
   enum ESongMode {
     e_twinkleTwinkle,
@@ -171,40 +171,30 @@ void GenerateSamples (std::vector<float>& samples, int sampleRate) {
   for (int index = 0, numSamples = samples.size(); index < numSamples; ++index) {
     switch (mode) {
       case e_twinkleTwinkle: {
-                               const int c_noteTime = sampleRate / 2;
-                               int time = index - timeBegin;
-                               // if we should start a new note
-                               if (time % c_noteTime == 0) {
-                                 int note = time / c_noteTime;
-                                 switch (note) {
-                                   case 0:
-                                   case 1: {
-                                             notes.push_back(CKarplusStrongStringPluck(CalcFrequency(3, 0), float(sampleRate), 0.996f));
-                                             break;
-                                           }
-                                   case 2:
-                                   case 3: {
-                                             notes.push_back(CKarplusStrongStringPluck(CalcFrequency(3, 7), float(sampleRate), 0.996f));
-                                             break;
-                                           }
-                                   case 4:
-                                   case 5: {
-                                             notes.push_back(CKarplusStrongStringPluck(CalcFrequency(3, 9), float(sampleRate), 0.996f));
-                                             break;
-                                           }
-                                   case 6: {
-                                             notes.push_back(CKarplusStrongStringPluck(CalcFrequency(3, 7), float(sampleRate), 0.996f));
-                                             break;
-                                           }
-                                   case 7: {
-                                             mode = e_strum;
-                                             timeBegin = index+1;
-                                             break;
-                                           }
-                                 }
-                               }
-                               break;
-                             }
+         const int c_noteTime = sampleRate / 2;
+         int time = index - timeBegin;
+         // if we should start a new note
+         if (time % c_noteTime == 0) {
+           int note = time / c_noteTime;
+           switch (note) {
+             case 0:
+             case 1: notes.push_back(StringPluck(CalcFrequency(3, 0), float(sampleRate), 0.996f));
+                     break;
+             case 2:
+             case 3: notes.push_back(StringPluck(CalcFrequency(3, 7), float(sampleRate), 0.996f));
+                     break;
+             case 4:
+             case 5: notes.push_back(StringPluck(CalcFrequency(3, 9), float(sampleRate), 0.996f));
+                     break;
+             case 6: notes.push_back(StringPluck(CalcFrequency(3, 7), float(sampleRate), 0.996f));
+                     break;
+             case 7: mode = e_strum;
+                     timeBegin = index+1;
+                     break;
+           }
+         }
+         break;
+       }
       case e_strum: {
                       const int c_noteTime = sampleRate / 32;
                       int time = index - timeBegin - sampleRate;
@@ -212,10 +202,10 @@ void GenerateSamples (std::vector<float>& samples, int sampleRate) {
                       if (time % c_noteTime == 0) {
                         int note = time / c_noteTime;
                         switch (note) {
-                          case 0: notes.push_back(CKarplusStrongStringPluck(55.0f, float(sampleRate), 0.996f)); break;
-                          case 1: notes.push_back(CKarplusStrongStringPluck(55.0f + 110.0f, float(sampleRate), 0.996f)); break;
-                          case 2: notes.push_back(CKarplusStrongStringPluck(55.0f + 220.0f, float(sampleRate), 0.996f)); break;
-                          case 3: notes.push_back(CKarplusStrongStringPluck(55.0f + 330.0f, float(sampleRate), 0.996f)); break;
+                          case 0: notes.push_back(StringPluck(55.0f, float(sampleRate), 0.996f)); break;
+                          case 1: notes.push_back(StringPluck(55.0f + 110.0f, float(sampleRate), 0.996f)); break;
+                          case 2: notes.push_back(StringPluck(55.0f + 220.0f, float(sampleRate), 0.996f)); break;
+                          case 3: notes.push_back(StringPluck(55.0f + 330.0f, float(sampleRate), 0.996f)); break;
                           case 4: mode = e_strum; timeBegin = index + 1; break;
                         }
                       }
@@ -225,7 +215,7 @@ void GenerateSamples (std::vector<float>& samples, int sampleRate) {
 
     // generate and mix our samples from our notes
     samples[index] = 0;
-    for (CKarplusStrongStringPluck& note : notes)
+    for (StringPluck& note : notes)
       samples[index] += note.GenerateSample();
 
     // to keep from clipping
